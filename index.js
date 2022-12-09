@@ -1,68 +1,71 @@
-'use strict';
-const path = require('path');
-const fs = require('fs');
-const execa = require('execa');
-const {isElectron} = require('electron-util/node');
-const macosVersion = require('macos-version');
+"use strict";
+const path = require("path");
+const fs = require("fs");
+// const execa = require("execa");
+const { spawnSync } = require("child_process");
+const { isElectron } = require("electron-util/node");
+const macosVersion = require("macos-version");
 
-const permissionExists = macosVersion.isGreaterThanOrEqualTo('10.15');
+const permissionExists = macosVersion.isGreaterThanOrEqualTo("10.15");
 
 let filePath;
 
 if (isElectron) {
-	const {api, openSystemPreferences} = require('electron-util');
+  const { api, openSystemPreferences } = require("electron-util");
 
-	exports.openSystemPreferences = () => openSystemPreferences('security', 'Privacy_ScreenCapture');
+  exports.openSystemPreferences = async () => {
+    return await openSystemPreferences("security", "Privacy_ScreenCapture");
+  };
 
-	filePath = api.app && path.join(api.app.getPath('userData'), '.has-app-requested-screen-capture-permissions');
+  filePath = api.app && path.join(api.app.getPath("userData"), ".has-app-requested-screen-capture-permissions");
 }
 
 exports.hasScreenCapturePermission = () => {
-	if (!permissionExists) {
-		return true;
-	}
+  if (!permissionExists) {
+    return true;
+  }
 
-	const screenCapturePermission = require('./build/Release/screencapturepermissions');
-	const hasPermission = screenCapturePermission.hasPermissions();
+  const screenCapturePermission = require("./build/Release/screencapturepermissions");
+  const hasPermission = screenCapturePermission.hasPermissions();
 
-	if (!hasPermission && filePath) {
-		try {
-			fs.writeFileSync(filePath, '');
-		} catch (error) {
-			if (error.code === 'ENOENT') {
-				fs.mkdirSync(path.dirname(filePath));
-				fs.writeFileSync(filePath, '');
-			}
+  if (!hasPermission && filePath) {
+    try {
+      fs.writeFileSync(filePath, "");
+    } catch (error) {
+      if (error.code === "ENOENT") {
+        fs.mkdirSync(path.dirname(filePath));
+        fs.writeFileSync(filePath, "");
+      }
 
-			throw error;
-		}
-	}
+      throw error;
+    }
+  }
 
-	return hasPermission;
+  return hasPermission;
 };
 
 exports.hasPromptedForPermission = () => {
-	if (!permissionExists) {
-		return false;
-	}
+  if (!permissionExists) {
+    return false;
+  }
 
-	if (filePath && fs.existsSync(filePath)) {
-		return true;
-	}
+  if (filePath && fs.existsSync(filePath)) {
+    return true;
+  }
 
-	return false;
+  return false;
 };
 
-exports.resetPermissions = ({bundleId = ''} = {}) => {
-	try {
-		execa.sync('tccutil', ['reset', 'ScreenCapture', bundleId].filter(Boolean));
+exports.resetPermissions = ({ bundleId = "" } = {}) => {
+  try {
+    spawnSync("tccutil", ["reset", "ScreenCapture", bundleId].filter(Boolean));
 
-		if (filePath && fs.existsSync(filePath)) {
-			fs.unlinkSync(filePath);
-		}
+    if (filePath && fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
 
-		return true;
-	} catch (error) {
-		return false;
-	}
+    return true;
+  } catch (error) {
+    return false;
+  }
 };

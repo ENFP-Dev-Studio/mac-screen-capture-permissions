@@ -1,34 +1,35 @@
 {
-  "name": "@luke/mac-screen-capture-permissions",
-  "version": "2.0.1",
+  "name": "mac-screen-recording-permissions",
+  "version": "1.0.0",
   "description": "Check and request permission to capture the screen",
   "main": "index.js",
-  "repository": "https://github.com/LukeXeon/mac-screen-capture-permissions",
-  "author": {
-    "name": "George Karagkiaouris",
-    "email": "gkaragkiaouris2@gmail.com",
-    "url": "https://gkaragkiaouris.tech"
+  "repository": {
+    "url": "https://github.com/ENFP-Dev-Studio/mac-screen-recording-permissions",
+    "type": "git"
   },
   "license": "MIT",
   "private": false,
   "scripts": {
-    "start": "electron example.js",
-    "test": "xo && tsd",
-    "native_build": "node-gyp rebuild",
-    "install": "prebuild-install || node install.js"
+    "test": "./node_modules/.bin/mocha --reporter spec",
+    "install": "node-gyp rebuild",
+    "build": "node-gyp build"
   },
   "dependencies": {
-    "electron-util": "^0.13.0",
-    "execa": "^2.0.4",
-    "macos-version": "^5.2.1",
-    "prebuild-install": "^6.0.0"
+    "electron-util": "^0.17.2",
+    "macos-version": "^6.0.0",
+    "node-addon-api": "^5.0.0",
+    "prebuild-install": "^7.1.1"
   },
   "devDependencies": {
-    "electron": "^7.1.0",
-    "node-abi": "^2.26.0",
-    "prebuild": "^10.0.1",
-    "tsd": "^0.11.0",
-    "xo": "^0.24.0"
+    "chai": "^4.3.7",
+    "electron": "^22.0.0",
+    "fix-path": "^4.0.0",
+    "mocha": "^10.1.0",
+    "node-abi": "^3.30.0",
+    "node-gyp": "^9.3.0",
+    "prebuild": "^11.0.4",
+    "tsd": "^0.25.0",
+    "xo": "^0.53.1"
   },
   "keywords": [
     "macos",
@@ -44,7 +45,7 @@
     "electron"
   ],
   "engines": {
-    "node": ">=8"
+    "node": ">=18"
   },
   "os": [
     "darwin"
